@@ -48,7 +48,8 @@ class Test:
             if self.get('state') == 'passing':
                 self.set('state', 'failing')
             alert_time = time.time()
-            if alert_time - self.get('last_fail_alert_time', 0) >= self.alert_period_hours * 60 * 60:
+            last_alert_fail_time = self.get('last_fail_alert_time', 0)
+            if alert_time - last_alert_fail_time >= self.alert_period_hours * 60 * 60:
                 self.set('last_fail_alert_time', alert_time)
                 self.owner.notify(self.expand_message(self.down_message))
         self.set('last_fail_time', time.time())
@@ -106,11 +107,7 @@ class HTTPTest(Test):
         self.do_pass(state)
 
 
-TEST_PROVIDERS = [
-    ('shell', ShellTest),
-    ('tcp', TCPTest),
-    ('http', HTTPTest)
-]
+TEST_PROVIDERS = [('shell', ShellTest), ('tcp', TCPTest), ('http', HTTPTest)]
 
 
 class Alert:
@@ -142,13 +139,11 @@ class TwilioAlert(Alert):
     def send(self, message):
         from twilio.rest import Client
         client = Client(self.account_sid, self.auth_token)
-        client.api.account.messages.create(to=self.to_number, from_=self.from_number, body=message)
+        client.api.account.messages.create(
+            to=self.to_number, from_=self.from_number, body=message)
 
 
-ALERT_PROVIDERS = [
-    ('shell', ShellAlert),
-    ('twilio', TwilioAlert)
-]
+ALERT_PROVIDERS = [('shell', ShellAlert), ('twilio', TwilioAlert)]
 
 
 class Heartbeat:
@@ -192,10 +187,7 @@ class Heartbeat:
 
     def test(self):
         for test in self.tests:
-            try:
-                test.run(self.state)
-            except TestError as err:
-                self.notify(err.message)
+            test.run(self.state)
 
     def run(self):
         self.load_config()
@@ -203,8 +195,7 @@ class Heartbeat:
         self.test()
         self.save_state()
 
+
 if __name__ == '__main__':
     heartbeat = Heartbeat()
     heartbeat.run()
-
-
