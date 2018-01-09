@@ -1,7 +1,15 @@
+#!/usr/bin/env python3
+import datetime
 import hashlib
 import json
 import time
 import yaml
+
+DATETIME_FORMAT = '%m/%d %H:%M'
+
+
+def format_now():
+    return datetime.datetime.now().format(DATETIME_FORMAT)
 
 
 class Test:
@@ -33,26 +41,28 @@ class Test:
             message = message.replace('$' + key, str(value))
         return message
 
-    def do_pass(self, heartbeat):
+    def do_pass(self):
         if self.get('state') == 'failing':
             self.owner.notify(self.expand_message(self.up_message))
             self.set('state', 'passing')
+            self.set('first_pass_time', format_now())
             self.set('last_fail_alert_time', 0)
-        self.set('last_pass_time', time.time())
+        self.set('last_pass_time', format_now())
         self.set('fail_count', 0)
 
-    def do_fail(self, heartbeat):
+    def do_fail(self):
         fail_count = self.get('fail_count', 0) + 1
         self.set('fail_count', fail_count)
         if fail_count > self.ignore_fail_count:
             if self.get('state') == 'passing':
                 self.set('state', 'failing')
+                self.set('first_fail_time', format_now())
             alert_time = time.time()
             last_alert_fail_time = self.get('last_fail_alert_time', 0)
             if alert_time - last_alert_fail_time >= self.alert_period_hours * 60 * 60:
                 self.set('last_fail_alert_time', alert_time)
                 self.owner.notify(self.expand_message(self.down_message))
-        self.set('last_fail_time', time.time())
+        self.set('last_fail_time', format_now())
 
 
 class ShellTest(Test):
@@ -61,14 +71,14 @@ class ShellTest(Test):
         import subprocess
         self.command = config['command']
 
-    def run(self, state):
+    def run(self):
         import subprocess
         try:
             subprocess.run(self.command, shell=True, check=True)
         except subprocess.CalledProcessError:
-            self.do_fail(state)
+            self.do_fail()
         else:
-            self.do_pass(state)
+            self.do_pass()
 
 
 class TCPTest(Test):
@@ -84,10 +94,11 @@ class TCPTest(Test):
             with socket.create_connection((self.host, self.port)) as sock:
                 print('{}:{} OK'.format(self.host, self.port))
                 sock.shutdown(socket.SHUT_RDWR)
-                self.do_pass(state)
         except OSError as err:
             print('{}:{} {}'.format(self.host, self.port, err))
-            self.do_fail(state)
+            self.do_fail()
+        else:
+            self.do_pass()
 
 
 class HTTPTest(Test):
@@ -101,10 +112,10 @@ class HTTPTest(Test):
         import requests
         r = requests.get(self.url, headers=self.headers)
         print(self.url, r.status_code, r.reason)
-        if r.status_code != 200:
-            self.do_fail(state)
-            return
-        self.do_pass(state)
+        if r.status_code == 200:
+            self.do_pass()
+        else:
+            self.do_fail()
 
 
 TEST_PROVIDERS = [('shell', ShellTest), ('tcp', TCPTest), ('http', HTTPTest)]
