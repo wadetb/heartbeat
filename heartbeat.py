@@ -17,8 +17,8 @@ class Test:
         self.owner = owner
         self.config = config
         self.id = hashlib.sha256(json.dumps(config).encode()).hexdigest()
-        self.down_message = config.setdefault('down_message', '$name is down')
-        self.up_message = config.setdefault('up_message', '$name is up')
+        self.down_message = config.setdefault('down_message', '$name is down, since $last_pass_time')
+        self.up_message = config.setdefault('up_message', '$name is back up')
         self.ignore_fail_count = config.setdefault('ignore_fail_count', 0)
         self.alert_period_hours = config.setdefault('alert_period_hours', 1.0)
 
@@ -42,7 +42,7 @@ class Test:
         return message
 
     def do_pass(self):
-        if self.get('state') == 'failing':
+        if self.get('state') != 'passing':
             self.owner.notify(self.expand_message(self.up_message))
             self.set('state', 'passing')
             self.set('first_pass_time', format_now())
@@ -54,7 +54,7 @@ class Test:
         fail_count = self.get('fail_count', 0) + 1
         self.set('fail_count', fail_count)
         if fail_count > self.ignore_fail_count:
-            if self.get('state') == 'passing':
+            if self.get('state') != 'failing':
                 self.set('state', 'failing')
                 self.set('first_fail_time', format_now())
             alert_time = time.time()
