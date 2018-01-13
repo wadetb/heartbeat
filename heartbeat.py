@@ -9,7 +9,7 @@ DATETIME_FORMAT = '%m/%d %H:%M'
 
 
 def format_now():
-    return datetime.datetime.now().format(DATETIME_FORMAT)
+    return datetime.datetime.now().strftime(DATETIME_FORMAT)
 
 
 class Test:
@@ -88,7 +88,7 @@ class TCPTest(Test):
         self.host = config['host']
         self.port = config['port']
 
-    def run(self, state):
+    def run(self):
         import socket
         try:
             with socket.create_connection((self.host, self.port)) as sock:
@@ -108,7 +108,7 @@ class HTTPTest(Test):
         self.url = config['url']
         self.headers = config.get('headers', {})
 
-    def run(self, state):
+    def run(self):
         import requests
         r = requests.get(self.url, headers=self.headers)
         print(self.url, r.status_code, r.reason)
@@ -198,7 +198,7 @@ class Heartbeat:
 
     def test(self):
         for test in self.tests:
-            test.run(self.state)
+            test.run()
 
     def run(self):
         self.load_config()
