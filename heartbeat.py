@@ -18,7 +18,7 @@ class Test:
         self.config = config
         self.id = hashlib.sha256(json.dumps(config).encode()).hexdigest()
         self.down_message = config.setdefault('down_message', '$name is down, since $last_pass_time')
-        self.up_message = config.setdefault('up_message', '$name is back up')
+        self.up_message = config.setdefault('up_message', '$name is up')
         self.ignore_fail_count = config.setdefault('ignore_fail_count', 0)
         self.alert_period_hours = config.setdefault('alert_period_hours', 1.0)
 
