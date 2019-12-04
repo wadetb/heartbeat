@@ -47,11 +47,13 @@ class Test:
             self.set('state', 'passing')
             self.set('first_pass_time', format_now())
             self.set('last_fail_alert_time', 0)
+        self.set('name', self.config['name'])
         self.set('last_pass_time', format_now())
         self.set('fail_count', 0)
 
     def do_fail(self):
         fail_count = self.get('fail_count', 0) + 1
+        self.set('name', self.config['name'])
         self.set('fail_count', fail_count)
         if fail_count > self.ignore_fail_count:
             if self.get('state') != 'failing':
@@ -110,11 +112,14 @@ class HTTPTest(Test):
 
     def run(self):
         import requests
-        r = requests.get(self.url, headers=self.headers)
-        print(self.url, r.status_code, r.reason)
-        if r.status_code == 200:
-            self.do_pass()
-        else:
+        try:
+            r = requests.get(self.url, headers=self.headers)
+            print(self.url, r.status_code, r.reason)
+            if r.status_code == 200:
+                self.do_pass()
+            else:
+                self.do_fail()
+        except Exception as e:
             self.do_fail()
 
 
