@@ -25,7 +25,7 @@ The configuration file is divided into two sections: **tests** and **alerts**.
 ## Tests configuration
 
 Tests are checks that are performed when the `heartbeat` utility runs.
-Any tests that fail will trigger alerts. Supported tests include `http`, `tcp`, and `shell`. 
+Any tests that fail will trigger alerts. Supported tests include `http`, `tcp`, and `shell`.
 
 Common test configuration settings:
 
@@ -45,6 +45,7 @@ Common test configuration settings:
 |-|-|
 |url|The URL to query, required. Must be HTTP or HTTPS.|
 |headers|Dictionary of additional headers to send.|
+|timeout|Stop waiting for a response after a given number of seconds.|
 
 Example:
 
@@ -66,6 +67,7 @@ Example:
 |-|-|
 |host|Host name or IP address to connect to, required.|
 |port|Port number to open, required.|
+|timeout|Seconds to wait for a connection before timing out.|
 
 Example:
 
@@ -84,6 +86,7 @@ Example:
 |||
 |-|-|
 |command|Command to execute using the current shell, required.|
+|timeout|Seconds to wait for the child process to exit.|
 
 Example:
 
