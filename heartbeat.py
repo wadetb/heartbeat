@@ -72,11 +72,12 @@ class ShellTest(Test):
         super().__init__(owner, config)
         import subprocess
         self.command = config['command']
+        self.timeout = config.get('timeout')
 
     def run(self):
         import subprocess
         try:
-            subprocess.run(self.command, shell=True, check=True)
+            subprocess.run(self.command, shell=True, check=True, timeout=self.timeout)
         except subprocess.CalledProcessError:
             self.do_fail()
         else:
@@ -89,11 +90,12 @@ class TCPTest(Test):
         import socket
         self.host = config['host']
         self.port = config['port']
+        self.timeout = config.get('timeout')
 
     def run(self):
         import socket
         try:
-            with socket.create_connection((self.host, self.port)) as sock:
+            with socket.create_connection((self.host, self.port), self.timeout) as sock:
                 print('{}:{} OK'.format(self.host, self.port))
                 sock.shutdown(socket.SHUT_RDWR)
         except OSError as err:
@@ -109,11 +111,12 @@ class HTTPTest(Test):
         import requests
         self.url = config['url']
         self.headers = config.get('headers', {})
+        self.timeout = config.get('timeout')
 
     def run(self):
         import requests
         try:
-            r = requests.get(self.url, headers=self.headers)
+            r = requests.get(self.url, headers=self.headers, timeout=self.timeout)
             print(self.url, r.status_code, r.reason)
             if r.status_code == 200:
                 self.do_pass()
