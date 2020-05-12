@@ -1,1 +1,3 @@
 .vscode
+.heartbeat.json
+heartbeat.yaml
