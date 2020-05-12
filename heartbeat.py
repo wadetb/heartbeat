@@ -4,12 +4,13 @@ import hashlib
 import json
 import time
 import yaml
+from pathlib import Path
 
 DATETIME_FORMAT = '%m/%d %H:%M'
 
 
-def format_now():
-    return datetime.datetime.now().strftime(DATETIME_FORMAT)
+# without changing to string only works after python 3.5
+f_path = str(Path(__file__).parent) + '/'
 
 
 class Test:
@@ -186,20 +187,20 @@ class Heartbeat:
                     self.alerts.append(provider(alert[key]))
 
     def load_config(self):
-        with open('heartbeat.yaml') as config_file:
+        with open(f_path + 'heartbeat.yaml') as config_file:
             config = yaml.safe_load(config_file)
         self._load_tests(config['tests'])
         self._load_alerts(config['alerts'])
 
     def load_state(self):
         try:
-            with open('.heartbeat.json') as state_file:
+            with open(f_path + '.heartbeat.json') as state_file:
                 self.state = json.load(state_file)
         except:
             self.state = {}
 
     def save_state(self):
-        with open('.heartbeat.json', 'w') as state_file:
+        with open(f_path + '.heartbeat.json', 'w') as state_file:
             json.dump(self.state, state_file)
 
     def notify(self, message):
