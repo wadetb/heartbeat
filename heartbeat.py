@@ -42,8 +42,10 @@ class Test:
         return message
 
     def do_pass(self):
-        if self.get('state') != 'passing':
+        now = int(time.time())
+        if self.get('state') == 'failing':
             self.owner.notify(self.expand_message(self.up_message))
+        if self.get('state') != 'passing':
             self.set('state', 'passing')
             self.set('first_pass_time', format_now())
             self.set('last_fail_alert_time', 0)
