@@ -16,7 +16,7 @@ class Test:
     def __init__(self, owner, config):
         self.owner = owner
         self.config = config
-        self.id = hashlib.sha256(json.dumps(config).encode()).hexdigest()
+        self.id = hashlib.sha256(json.dumps(config, sort_keys=True).encode()).hexdigest()
         self.down_message = config.setdefault('down_message', '$name is down, since $last_pass_time')
         self.up_message = config.setdefault('up_message', '$name is up')
         self.ignore_fail_count = config.setdefault('ignore_fail_count', 0)
