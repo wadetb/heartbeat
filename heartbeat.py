@@ -175,6 +175,7 @@ class GmailAlert(Alert):
         self.gmail_password = config['gmail_password']
         self.sent_from = config['sent_from']
         self.to = config['to']
+        self.subject = config['subject']
 
     def send(self, message):
         try:
@@ -184,7 +185,7 @@ class GmailAlert(Alert):
             msg = MIMEMultipart()
             msg['From'] = self.sent_from
             msg['To'] = self.to
-            msg['Subject'] = 'Heartbeat notice'
+            msg['Subject'] = self.subject
             msg.attach(MIMEText(message, 'plain'))
             server.sendmail(self.sent_from, self.to, msg.as_string())
             server.close()
