@@ -14,7 +14,7 @@ DATETIME_FORMAT = '%m/%d %H:%M'
 f_path = str(Path(__file__).parent) + '/'
 
 def format(s):
-    return time.gmtime(s).strftime(DATETIME_FORMAT)
+    return time.strftime(DATETIME_FORMAT, time.gmtime(s))
 
 class Test:
     def __init__(self, owner, config):
@@ -51,10 +51,10 @@ class Test:
             self.owner.notify(self.expand_message(self.up_message))
         if self.get('state') != 'passing':
             self.set('state', 'passing')
-            self.set('first_pass_time', now)
+            self.set('first_pass_time', format(now))
             self.set('last_fail_alert_time', 0)
         self.set('name', self.config['name'])
-        self.set('last_pass_time', now)
+        self.set('last_pass_time', format(now))
         self.set('fail_count', 0)
 
     def do_fail(self):
@@ -65,14 +65,14 @@ class Test:
         if fail_count > self.ignore_fail_count:
             if self.get('state') != 'failing':
                 self.set('state', 'failing')
-                self.set('first_fail_time', now)
+                self.set('first_fail_time', format(now))
             last_alert_fail_time = self.get('last_fail_alert_time', 0)
             if now - last_alert_fail_time >= self.alert_period_hours * 60 * 60:
                 print('alert since ' + str(self.alert_period_hours) + ' hour has passed')
                 self.set('last_fail_alert_time', now)
                 self.owner.notify(self.expand_message(self.down_message))
             print('ignoring alert since less then ' + str(self.alert_period_hours) + ' hour from previous failure')
-        self.set('last_fail_time', now)
+        self.set('last_fail_time', format(now))
 
 
 class ShellTest(Test):
