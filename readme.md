@@ -159,8 +159,8 @@ Example:
 
 # Installation
 
-Run every minute via `crontab -e`:
+Run every minute via `crontab -e`, set argument `rts`(relative to script) to true in order to find config file relative to the python script:
 
 ```
-* * * * * /usr/local/bin/python3 /home/me/heartbeat.py
+* * * * * /usr/local/bin/python3 /home/me/heartbeat.py --rts
 ```

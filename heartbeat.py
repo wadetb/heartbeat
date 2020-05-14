@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import argparse
 import hashlib
 import json
 import time
@@ -10,8 +11,15 @@ from email.mime.text import MIMEText
 
 DATETIME_FORMAT = '%m/%d %H:%M'
 
+# Initiate the parser
+parser = argparse.ArgumentParser()
+# rts stands for "relative to script"
+parser.add_argument('--rts', action='store_true', help='find heartbeat.yaml relative to heartbeat.py')
+# Read arguments from the command line
+args = parser.parse_args()
+
 # without changing to string only works after python 3.5
-f_path = str(Path(__file__).parent) + '/'
+f_path = str(Path(__file__).parent) + '/' if args.rts else ''
 
 def format(s):
     return time.strftime(DATETIME_FORMAT, time.gmtime(s))
