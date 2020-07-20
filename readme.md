@@ -103,12 +103,14 @@ Alerts are notifications sent when tests fail. Supported alerts include `twilio`
 
 
 ### Gmail
-sent alerts from gmail(Creating an [application specific password](https://security.google.com/settings/security/apppasswords) is required)
+
+Sends alerts from Gmail - creating an [application specific password](https://security.google.com/settings/security/apppasswords) is required.
+
 |||
 |-|-|
-|sent_from|gmail address, required|
-|gmail_password|gmail's 3rd party password, required.|
-|to|mail address sending to, required.|
+|sent_from|Gmail address, required.|
+|gmail_password|Gmail's 3rd party password, required.|
+|to|Email address sending to, required.|
 |subject|The subject, required.|
 
 ### Twilio
@@ -159,8 +161,14 @@ Example:
 
 # Installation
 
-Run every minute via `crontab -e`, set argument `rts`(relative to script) to true in order to find config file relative to the python script:
+Run every minute via `crontab -e`:
 
 ```
-* * * * * /usr/local/bin/python3 /home/me/heartbeat.py --rts
+* * * * * /usr/local/bin/python3 /home/me/heartbeat.py
+```
+
+Storing heartbeat.yaml and the state in the home directory:
+
+```
+* * * * * cd /home/me/.heartbeat && /usr/local/bin/python3 heartbeat.py
 ```
