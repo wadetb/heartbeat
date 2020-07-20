@@ -1,5 +1,7 @@
 # Heartbeat utility
 
+_A dummy change to test CI_
+
 This simple Python 3 utility checks that servers are alive and responding. I use it with [Twilio](https://www.twilio.com/) to text me when one of my servers go down, for whatever reason.
 
 It's invoked using `python3 heartbeat.py`, reads its configuration from a configuration file `heartbeat.yaml`, and saves its state in `.heartbeat.state.json`.
