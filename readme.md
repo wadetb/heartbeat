@@ -172,3 +172,9 @@ Storing heartbeat.yaml and the state in the home directory:
 ```
 * * * * * cd /home/me/.heartbeat && /usr/local/bin/python3 heartbeat.py
 ```
+
+Specify a custom configuration and state file:
+
+```
+* * * * * /usr/local/bin/python3 /home/me/heartbeat.py -c /home/me/custom.yaml -s /home/me/.heartbeat.json
+```

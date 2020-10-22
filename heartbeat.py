@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # pylint: disable=invalid-name,too-few-public-methods,missing-docstring
 # pylint: disable=import-outside-toplevel,unused-import,broad-except
+import argparse
 import datetime
 import hashlib
 import json
@@ -13,6 +14,25 @@ DATETIME_FORMAT = '%m/%d %H:%M'
 
 def format_now():
     return datetime.datetime.now().strftime(DATETIME_FORMAT)
+
+
+def parse_args() -> list:
+    parser = argparse.ArgumentParser(usage='%(prog)s [options]')
+    parser.add_argument(
+        '-c',
+        '--config',
+        action='store',
+        metavar='FILE',
+        default='heartbeat.yaml',
+        help='set configuration file')
+    parser.add_argument(
+        '-s',
+        '--state',
+        action='store',
+        metavar='FILE',
+        default='.heartbeat.json',
+        help='set state file')
+    return parser.parse_args()
 
 
 class Test:
@@ -200,7 +220,9 @@ ALERT_PROVIDERS = [('shell', ShellAlert), ('twilio', TwilioAlert), ('gmail', Gma
 
 
 class Heartbeat:
-    def __init__(self):
+    def __init__(self, config_path, state_path):
+        self.config_path = config_path
+        self.state_path = state_path
         self.tests = []
         self.alerts = []
         self.state = {}
@@ -218,20 +240,20 @@ class Heartbeat:
                     self.alerts.append(provider(alert[key]))
 
     def load_config(self):
-        with open('heartbeat.yaml') as config_file:
+        with open(self.config_path) as config_file:
             config = yaml.safe_load(config_file)
         self._load_tests(config['tests'])
         self._load_alerts(config['alerts'])
 
     def load_state(self):
         try:
-            with open('.heartbeat.json') as state_file:
+            with open(self.state_path) as state_file:
                 self.state = json.load(state_file)
         except Exception:
             self.state = {}
 
     def save_state(self):
-        with open('.heartbeat.json', 'w') as state_file:
+        with open(self.state_path, 'w') as state_file:
             json.dump(self.state, state_file)
 
     def notify(self, message):
@@ -250,5 +272,6 @@ class Heartbeat:
 
 
 if __name__ == '__main__':
-    heartbeat = Heartbeat()
+    args = parse_args()
+    heartbeat = Heartbeat(args.config, args.state)
     heartbeat.run()
