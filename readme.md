@@ -161,6 +161,49 @@ Example:
 
 # Installation
 
+## Via Systemd
+
+Create a file `/etc/systemd/system/heartbeat.service`:
+
+```
+[Unit]
+Description=Server heartbeat
+Wants=heartbeat.timer
+
+[Service]
+Type=oneshot
+User=xxx
+WorkingDirectory=/home/xxx
+ExecStart=/usr/bin/python3 /home/xxx/heartbeat/heartbeat.py
+
+[Install]
+WantedBy=multi-user.target
+```
+
+And another file `/etc/systemd/system/heartbeat.timer`:
+
+```
+[Unit]
+Description=Server heartbeat
+Requires=heartbeat.service
+
+[Timer]
+Unit=heartbeat.service
+OnCalendar=*-*-* *:*:00
+
+[Install]
+WantedBy=timers.target
+```
+
+And run:
+
+```
+sudo systemctl enable heartbeat.timer
+sudo systemctl start heartbeat.timer
+```
+
+## Via cron
+
 Run every minute via `crontab -e`:
 
 ```
